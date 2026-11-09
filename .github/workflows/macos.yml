@@ -1,0 +1,25 @@
+name: macOS build
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14   # Apple Silicon
+    steps:
+      - uses: actions/checkout@v4
+      - name: Versões
+        run: sw_vers && swift --version
+      - name: Testes do núcleo
+        run: swift test
+      - name: Gerar UnificadorVR.app
+        run: ./build_app.sh
+      - name: Conferir bundle
+        run: |
+          plutil -lint build/UnificadorVR.app/Contents/Info.plist
+          file build/UnificadorVR.app/Contents/MacOS/UnificadorVR
+      - uses: actions/upload-artifact@v4
+        with:
+          name: UnificadorVR.app
+          path: build/UnificadorVR.app
