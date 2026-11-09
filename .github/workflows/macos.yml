@@ -1,7 +1,7 @@
 name: macOS build
 
+# Só manual (Actions › macOS build › Run workflow): runners macOS consomem minutos pagos em repo privado.
 on:
-  push:
   workflow_dispatch:
 
 jobs:
