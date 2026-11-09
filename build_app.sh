@@ -26,7 +26,7 @@ echo "› Compilando (release, $ARCH)…"
 swift build -c release --arch "$ARCH" --product "$APP_NAME"
 BIN_DIR="$(swift build -c release --arch "$ARCH" --show-bin-path)"
 
-echo "› Montando $APP…"
+echo "› Montando ${APP}…"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN_DIR/$APP_NAME" "$APP/Contents/MacOS/$APP_NAME"
