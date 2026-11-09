@@ -1,8 +1,12 @@
 name: macOS build
 
-# Só manual (Actions › macOS build › Run workflow): runners macOS consomem minutos pagos em repo privado.
+# Só manual (Actions › macOS build › Run workflow).
+# Compila, testa, gera UnificadorVR.dmg e publica na página de Releases.
 on:
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -11,15 +15,29 @@ jobs:
       - uses: actions/checkout@v4
       - name: Versões
         run: sw_vers && swift --version
-      - name: Testes do núcleo
-        run: swift test
-      - name: Gerar UnificadorVR.app
+      - name: Gerar UnificadorVR.app (roda os testes antes)
         run: ./build_app.sh
       - name: Conferir bundle
         run: |
           plutil -lint build/UnificadorVR.app/Contents/Info.plist
           file build/UnificadorVR.app/Contents/MacOS/UnificadorVR
+      - name: Gerar UnificadorVR.dmg
+        run: |
+          rm -rf build/dmg && mkdir -p build/dmg
+          cp -R build/UnificadorVR.app build/dmg/
+          ln -s /Applications build/dmg/Aplicativos
+          hdiutil create -volname "Unificador VR" -srcfolder build/dmg -ov -format UDZO build/UnificadorVR.dmg
+          hdiutil verify build/UnificadorVR.dmg
       - uses: actions/upload-artifact@v4
         with:
-          name: UnificadorVR.app
-          path: build/UnificadorVR.app
+          name: UnificadorVR.dmg
+          path: build/UnificadorVR.dmg
+      - name: Publicar em Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="build-${GITHUB_SHA::7}"
+          gh release create "$TAG" build/UnificadorVR.dmg \
+            --target "$GITHUB_SHA" --latest \
+            --title "Unificador VR — build ${GITHUB_SHA::7}" \
+            --notes "Baixe UnificadorVR.dmg, abra e arraste o app para Aplicativos. Na primeira abertura: Ajustes do Sistema › Privacidade e Segurança › Abrir Mesmo Assim (o app não é assinado pela Apple)."

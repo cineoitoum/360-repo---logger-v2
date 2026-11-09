@@ -14,7 +14,17 @@ DESTINO/
 
 **Nenhum arquivo ou pasta é renomeado.** O app cria pastas novas com os mesmos nomes. O único "rename" que ele faz é no próprio arquivo temporário: `nome.partial` vira `nome` depois de verificado.
 
-## Instalação fácil (sem Terminal)
+## Instalar (jeito mais fácil)
+
+1. Baixe **[UnificadorVR.dmg](https://github.com/cineoitoum/360-repo---logger-v2/releases/latest/download/UnificadorVR.dmg)**.
+2. Abra o `.dmg` e arraste **UnificadorVR** para **Aplicativos**.
+3. Na primeira vez que abrir, o macOS avisa que não pode verificar o desenvolvedor, porque o app não é assinado pela Apple:
+   - **macOS 15 ou mais novo:** Ajustes do Sistema › Privacidade e Segurança › role até o fim › **Abrir Mesmo Assim**.
+   - **macOS 13–14:** botão direito no app › **Abrir** › **Abrir**.
+
+Isso só acontece na primeira abertura.
+
+## Instalação compilando no próprio Mac (alternativa)
 
 1. Baixe o projeto: no GitHub, botão verde **Code** › **Download ZIP**. Dê dois cliques no ZIP para descompactar.
 2. Dentro da pasta, dê dois cliques em **`Instalar Unificador VR.command`**.
