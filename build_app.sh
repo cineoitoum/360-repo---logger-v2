@@ -21,9 +21,10 @@ fi
 echo "› Rodando testes…"
 swift test
 
-echo "› Compilando (release, arm64)…"
-swift build -c release --arch arm64 --product "$APP_NAME"
-BIN_DIR="$(swift build -c release --arch arm64 --show-bin-path)"
+ARCH="$(uname -m)"   # arm64 no M1; x86_64 em Mac Intel
+echo "› Compilando (release, $ARCH)…"
+swift build -c release --arch "$ARCH" --product "$APP_NAME"
+BIN_DIR="$(swift build -c release --arch "$ARCH" --show-bin-path)"
 
 echo "› Montando $APP…"
 rm -rf "$APP"
@@ -73,10 +74,17 @@ if codesign -d --entitlements :- "$APP" 2>/dev/null | grep -q "com.apple.securit
 fi
 
 if [[ "${1:-}" == "--install" ]]; then
-  echo "› Instalando em /Applications…"
-  rm -rf "/Applications/$APP_NAME.app"
-  cp -R "$APP" /Applications/
-  echo "✓ /Applications/$APP_NAME.app"
+  # /Applications se der; senão ~/Applications (usuário sem permissão de administrador).
+  TARGET="/Applications"
+  if ! { [[ ! -e "$TARGET/$APP_NAME.app" ]] || rm -rf "$TARGET/$APP_NAME.app" 2>/dev/null; } \
+     || ! cp -R "$APP" "$TARGET/" 2>/dev/null; then
+    TARGET="$HOME/Applications"
+    mkdir -p "$TARGET"
+    rm -rf "$TARGET/$APP_NAME.app"
+    cp -R "$APP" "$TARGET/"
+  fi
+  echo "✓ Instalado em $TARGET/$APP_NAME.app"
+  echo "$TARGET/$APP_NAME.app" > "$OUT_DIR/.installed_path"
 else
   echo "✓ $APP"
 fi

@@ -14,6 +14,19 @@ DESTINO/
 
 **Nenhum arquivo ou pasta é renomeado.** O app cria pastas novas com os mesmos nomes. O único "rename" que ele faz é no próprio arquivo temporário: `nome.partial` vira `nome` depois de verificado.
 
+## Instalação fácil (sem Terminal)
+
+1. Baixe o projeto: no GitHub, botão verde **Code** › **Download ZIP**. Dê dois cliques no ZIP para descompactar.
+2. Dentro da pasta, dê dois cliques em **`Instalar Unificador VR.command`**.
+3. Se o macOS bloquear, você tem duas saídas:
+   - **macOS 13–14:** botão direito no arquivo › **Abrir** › **Abrir**.
+   - **macOS 15 ou mais novo:** Ajustes do Sistema › Privacidade e Segurança › role até o fim › **Abrir Mesmo Assim**.
+   - Funciona em qualquer versão: abra o **Terminal**, digite `bash ` (com espaço), arraste o arquivo para a janela e aperte **Enter**.
+4. Se faltarem as ferramentas da Apple, uma janela do macOS vai pedir para instalar: clique em **Instalar**. O instalador espera e continua sozinho.
+5. No fim, o app vai para **Aplicativos** e abre sozinho.
+
+Para **atualizar**, baixe o ZIP novo e rode o instalador de novo. Se algo falhar, o registro fica em `UnificadorVR_instalacao.log`, na Mesa.
+
 ## Compilar e rodar
 
 Requisito: Xcode 15 ou superior (ou só as Command Line Tools com Swift 5.9+).
