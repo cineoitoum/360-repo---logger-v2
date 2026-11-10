@@ -21,10 +21,15 @@ fi
 echo "› Rodando testes…"
 swift test
 
-ARCH="$(uname -m)"   # arm64 no M1; x86_64 em Mac Intel
-echo "› Compilando (release, $ARCH)…"
-swift build -c release --arch "$ARCH" --product "$APP_NAME"
-BIN_DIR="$(swift build -c release --arch "$ARCH" --show-bin-path)"
+# UNIVERSAL=1 gera binário para Apple Silicon E Intel (usado no .dmg de download).
+if [[ "${UNIVERSAL:-0}" == "1" ]]; then
+  ARCH_ARGS=(--arch arm64 --arch x86_64)
+else
+  ARCH_ARGS=(--arch "$(uname -m)")   # arm64 no M1; x86_64 em Mac Intel
+fi
+echo "› Compilando (release, ${ARCH_ARGS[*]})…"
+swift build -c release "${ARCH_ARGS[@]}" --product "$APP_NAME"
+BIN_DIR="$(swift build -c release "${ARCH_ARGS[@]}" --show-bin-path)"
 
 echo "› Montando ${APP}…"
 rm -rf "$APP"
