@@ -2,6 +2,9 @@ name: Diagnóstico (abre o app e tira print)
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/diagnostico.yml
 
 permissions:
   contents: write
