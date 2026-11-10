@@ -1,0 +1,45 @@
+name: Diagnóstico (abre o app e tira print)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  diag:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: UNIVERSAL=1 ./build_app.sh
+      - name: Abrir o app e capturar
+        run: |
+          mkdir -p diag
+          sw_vers > diag/sistema.txt
+          # 1) Pelo Finder (como o usuário faz)
+          open build/UnificadorVR.app
+          sleep 10
+          screencapture -x diag/1_open.png || echo "screencapture falhou" >> diag/erros.txt
+          pgrep -lf UnificadorVR > diag/processos.txt 2>&1 || echo "PROCESSO NÃO ESTÁ RODANDO" >> diag/processos.txt
+          osascript -e 'tell application "System Events" to get {name, position, size} of every window of (every process whose name is "UnificadorVR")' > diag/janelas.txt 2>&1 || true
+          log show --last 2m --predicate 'process == "UnificadorVR"' --style compact > diag/log_sistema.txt 2>&1 || true
+          ls ~/Library/Logs/DiagnosticReports/ 2>/dev/null | grep -i unificador > diag/crashes.txt || true
+          for f in ~/Library/Logs/DiagnosticReports/*Unificador*; do [ -f "$f" ] && cp "$f" diag/; done
+          pkill -f UnificadorVR || true
+          sleep 2
+          # 2) Executável direto, com saída capturada
+          ./build/UnificadorVR.app/Contents/MacOS/UnificadorVR > diag/stdout_stderr.txt 2>&1 &
+          sleep 10
+          screencapture -x diag/2_direto.png || true
+          pkill -f UnificadorVR || true
+          ls -la diag
+      - name: Publicar diagnóstico
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd diag && zip -r ../diag.zip . && cd ..
+          gh release delete diagnostico --yes --cleanup-tag || true
+          gh release create diagnostico diag.zip diag/*.png --prerelease --latest=false \
+            --target "$GITHUB_SHA" --title "Diagnóstico" --notes "Prints e logs de teste automático."
